@@ -1,81 +1,115 @@
 import streamlit as st
+import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Styled Calculator", page_icon="🧮", layout="centered")
+st.set_page_config(page_title="Advanced Calculator", page_icon="🧮", layout="centered")
 
-st.title("🧮 Beautiful Calculator")
+st.title("🧮 Advanced Beautiful Calculator")
 
-# Initialize session state
-if "expression" not in st.session_state:
-    st.session_state.expression = ""
-
-# Styling with CSS
-st.markdown("""
-    <style>
+calculator_html = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <style>
     .calculator {
-        display: grid;
-        grid-template-columns: repeat(4, 80px);
-        grid-gap: 10px;
-        justify-content: center;
+      width: 300px;
+      background: #222;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+      margin: auto;
     }
-    .calculator button {
-        height: 60px;
-        font-size: 20px;
-        border: none;
-        background: #f1f1f1;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
+    .display {
+      width: 100%;
+      height: 60px;
+      background: #000;
+      color: #0f0;
+      font-size: 2em;
+      text-align: right;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
     }
-    .calculator button:hover {
-        background: #ddd;
+    .keys {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
     }
-    .calculator button:active {
-        background: #ccc;
+    .keys button {
+      height: 60px;
+      font-size: 1.5em;
+      border: none;
+      border-radius: 8px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.2s;
     }
-    .result {
-        text-align: right;
-        font-size: 32px;
-        padding: 10px;
-        border: 2px solid #ccc;
-        border-radius: 8px;
-        margin-bottom: 20px;
-        background: #f9f9f9;
+    .keys button:hover {
+      background: #444;
     }
-    </style>
-""", unsafe_allow_html=True)
+    .keys button:active {
+      background: #555;
+    }
+    .operator {
+      background: #ff9500;
+    }
+    .operator:hover {
+      background: #e58c00;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <div id="display" class="display">0</div>
+    <div class="keys">
+      <button onclick="press('7')">7</button>
+      <button onclick="press('8')">8</button>
+      <button onclick="press('9')">9</button>
+      <button class="operator" onclick="press('/')">/</button>
+      <button onclick="press('4')">4</button>
+      <button onclick="press('5')">5</button>
+      <button onclick="press('6')">6</button>
+      <button class="operator" onclick="press('*')">*</button>
+      <button onclick="press('1')">1</button>
+      <button onclick="press('2')">2</button>
+      <button onclick="press('3')">3</button>
+      <button class="operator" onclick="press('-')">-</button>
+      <button onclick="press('0')">0</button>
+      <button onclick="press('.')">.</button>
+      <button onclick="clearDisplay()">C</button>
+      <button class="operator" onclick="press('+')">+</button>
+      <button class="operator" style="grid-column: span 4;" onclick="calculate()">=</button>
+    </div>
+  </div>
 
-# Display the current expression
-st.markdown(f'<div class="result">{st.session_state.expression}</div>', unsafe_allow_html=True)
+  <script>
+    let display = document.getElementById('display');
 
-# Handle button click
-def click(item):
-    st.session_state.expression += str(item)
+    function press(num) {
+      if (display.innerText === "0" || display.innerText === "Error") {
+        display.innerText = num;
+      } else {
+        display.innerText += num;
+      }
+    }
 
-def clear():
-    st.session_state.expression = ""
+    function clearDisplay() {
+      display.innerText = "0";
+    }
 
-def calculate():
-    try:
-        st.session_state.expression = str(eval(st.session_state.expression))
-    except:
-        st.session_state.expression = "Error"
+    function calculate() {
+      try {
+        display.innerText = eval(display.innerText);
+      } catch {
+        display.innerText = "Error";
+      }
+    }
+  </script>
+</body>
+</html>
+"""
 
-# Layout buttons in HTML
-buttons = [
-    ("7", "8", "9", "/"),
-    ("4", "5", "6", "*"),
-    ("1", "2", "3", "-"),
-    ("0", ".", "C", "+"),
-]
-
-# Render buttons
-st.markdown('<div class="calculator">', unsafe_allow_html=True)
-for row in buttons:
-    for btn in row:
-        if btn == "C":
-            st.button(btn, on_click=clear, key=btn)
-        else:
-            st.button(btn, on_click=click, args=(btn,), key=btn)
-# Equals button (spanning full row)
-st.button("=", on_click=calculate, key="=")
-st.markdown('</div>', unsafe_allow_html=True)
+# Embed the HTML
+components.html(calculator_html, height=500)
