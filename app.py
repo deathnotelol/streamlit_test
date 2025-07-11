@@ -129,7 +129,7 @@ elif st.session_state.page == "Calculator":
 </body>
 </html>
 """
-    components.html(calculator_html, height=500)
+    components.html(calculator_html, height=600)
 
 elif st.session_state.page == "Todo":
     st.title("✅ Todo List")
