@@ -1,15 +1,54 @@
 import streamlit as st
 
-st.set_page_config(page_title="Calculator with Buttons", page_icon="🧮")
+st.set_page_config(page_title="Styled Calculator", page_icon="🧮", layout="centered")
 
-st.title("🧮 Clickable Button Calculator")
+st.title("🧮 Beautiful Calculator")
 
 # Initialize session state
 if "expression" not in st.session_state:
     st.session_state.expression = ""
 
-# Function to handle button click
-def button_click(item):
+# Styling with CSS
+st.markdown("""
+    <style>
+    .calculator {
+        display: grid;
+        grid-template-columns: repeat(4, 80px);
+        grid-gap: 10px;
+        justify-content: center;
+    }
+    .calculator button {
+        height: 60px;
+        font-size: 20px;
+        border: none;
+        background: #f1f1f1;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .calculator button:hover {
+        background: #ddd;
+    }
+    .calculator button:active {
+        background: #ccc;
+    }
+    .result {
+        text-align: right;
+        font-size: 32px;
+        padding: 10px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        background: #f9f9f9;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Display the current expression
+st.markdown(f'<div class="result">{st.session_state.expression}</div>', unsafe_allow_html=True)
+
+# Handle button click
+def click(item):
     st.session_state.expression += str(item)
 
 def clear():
@@ -17,40 +56,26 @@ def clear():
 
 def calculate():
     try:
-        result = eval(st.session_state.expression)
-        st.session_state.expression = str(result)
+        st.session_state.expression = str(eval(st.session_state.expression))
     except:
         st.session_state.expression = "Error"
 
-# Display current expression
-st.text_input("Expression", st.session_state.expression, key="input", disabled=True)
+# Layout buttons in HTML
+buttons = [
+    ("7", "8", "9", "/"),
+    ("4", "5", "6", "*"),
+    ("1", "2", "3", "-"),
+    ("0", ".", "C", "+"),
+]
 
-# Layout for buttons
-col1, col2, col3, col4 = st.columns(4)
-
-with col1:
-    st.button("7", on_click=button_click, args=("7",))
-    st.button("4", on_click=button_click, args=("4",))
-    st.button("1", on_click=button_click, args=("1",))
-    st.button("0", on_click=button_click, args=("0",))
-
-with col2:
-    st.button("8", on_click=button_click, args=("8",))
-    st.button("5", on_click=button_click, args=("5",))
-    st.button("2", on_click=button_click, args=("2",))
-    st.button(".", on_click=button_click, args=(".",))
-
-with col3:
-    st.button("9", on_click=button_click, args=("9",))
-    st.button("6", on_click=button_click, args=("6",))
-    st.button("3", on_click=button_click, args=("3",))
-    st.button("C", on_click=clear)
-
-with col4:
-    st.button("+", on_click=button_click, args=("+",))
-    st.button("-", on_click=button_click, args=("-",))
-    st.button("*", on_click=button_click, args=("*",))
-    st.button("/", on_click=button_click, args=("/",))
-
-# Equals button
-st.button("=", on_click=calculate)
+# Render buttons
+st.markdown('<div class="calculator">', unsafe_allow_html=True)
+for row in buttons:
+    for btn in row:
+        if btn == "C":
+            st.button(btn, on_click=clear, key=btn)
+        else:
+            st.button(btn, on_click=click, args=(btn,), key=btn)
+# Equals button (spanning full row)
+st.button("=", on_click=calculate, key="=")
+st.markdown('</div>', unsafe_allow_html=True)
